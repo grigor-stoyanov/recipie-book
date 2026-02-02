@@ -1,0 +1,14 @@
+
+<article class="recipe-card" tabindex="0" aria-label="Recipe card for {{recipe.title}}">
+    <div class="recipe-card__media">
+        <img class="recipe-card__img" [src]="recipe.iconUrl" [alt]="recipe.title" />
+        <div class="recipe-card__overlay">
+            <button class="recipe-card__fav" aria-label="Favorite">❤</button>
+        </div>
+    </div>
+    <div class="recipe-card__body">
+        <h3 class="recipe-card__title">{{index}} {{recipe.title}}</h3>
+        <p class="recipe-card__desc">{{recipe.instructions}}</p>
+        <button class="recipe-card__btn" (click)="onViewRecipe()" aria-label="View recipe details">View Details</button>
+    </div>
+</article>

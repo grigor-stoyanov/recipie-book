@@ -1,3 +1,13 @@
-
-
-<router-outlet />
+<main class="app-container">
+  <section class="card-wrapper">
+    @for (recipe of recipes(); track recipe.id; let index = $index) {
+    <app-recipe-card
+     [index]="index"
+     (recipeSelected)="onRecipeSelected($event)"
+     [recipe]="recipe"/>
+    }
+    @empty {
+      <h1>No recipes available</h1>
+    }
+  </section>
+</main>
