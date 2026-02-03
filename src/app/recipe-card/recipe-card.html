@@ -1,7 +1,14 @@
 
 <article class="recipe-card" tabindex="0" aria-label="Recipe card for {{recipe.title}}">
     <div class="recipe-card__media">
+        @if(recipe.iconUrl) {
         <img class="recipe-card__img" [src]="recipe.iconUrl" [alt]="recipe.title" />
+        }
+        @else {
+        <div class="recipe-card__placeholder" aria-label="No image available">
+            <span class="recipe-card__placeholder-text">No Image available</span>
+        </div>
+        }
         <div class="recipe-card__overlay">
             <button class="recipe-card__fav" aria-label="Favorite">❤</button>
         </div>

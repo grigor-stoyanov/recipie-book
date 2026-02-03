@@ -1,8 +1,9 @@
 <main class="app-container">
   <section class="card-wrapper">
-    @for (recipe of recipes(); track recipe.id; let index = $index) {
+    <!-- Control flow syntax. Tracking by recipe.id for better performance. -->
+    @for (recipe of recipes(); track trackRecipe(index, recipe); let index = $index) {
     <app-recipe-card
-     [index]="index"
+     [index]="index+1"
      (recipeSelected)="onRecipeSelected($event)"
      [recipe]="recipe"/>
     }
@@ -10,4 +11,14 @@
       <h1>No recipes available</h1>
     }
   </section>
+  <div class="pagination">
+     <!-- oldsyntax uses *ngFor directive from CommonModule -->
+      <button 
+      *ngFor="let i of pages()"
+      [class.active]="currentPage === i"  
+      (click)="loadRecipes(i)"
+      >
+        {{ i }}
+      </button>
+  </div>
 </main>
