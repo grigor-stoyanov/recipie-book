@@ -1,5 +1,7 @@
 
-<article class="recipe-card" tabindex="0" aria-label="Recipe card for {{recipe.title}}">
+<article *ngIf="recipe;else noRecipe" class="recipe-card"
+[ngClass]="recipeComplexity()"
+tabindex="0" aria-label="Recipe card for {{recipe.title}}">
     <div class="recipe-card__media">
         @if(recipe.iconUrl) {
         <img class="recipe-card__img" [src]="recipe.iconUrl" [alt]="recipe.title" />
@@ -14,8 +16,45 @@
         </div>
     </div>
     <div class="recipe-card__body">
-        <h3 class="recipe-card__title">{{index}} {{recipe.title}}</h3>
-        <p class="recipe-card__desc">{{recipe.instructions}}</p>
+        <h3 class="recipe-card__title">{{index}} {{recipe.title | titlecase}}</h3>
+        <p class="recipe-card__desc">{{recipe.instructions | truncate:120}}</p>
+        <div class="recipe-card__info">
+            <ul class="recipe-card__ingredients" [ngStyle]="scaleIngredients()">
+                <span class="recipe-card__ingredients-title"><strong>Ingredients:</strong></span>
+                @for (ingredient of recipe.ingredients.slice(0,4); track $index) {
+                    <li class="recipe-card__ingredient-">{{ ingredient.ingredient.name }}</li>
+                }
+                @if(recipe.ingredients.length > 4) {
+                    <li class="recipe-card__ingredient-">+{{recipe.ingredients.length - 4}} more</li>
+                }
+            </ul>
+            <div class="recipe-card__details">
+            <span class="recipe-card__cooktime">🕒 {{recipe.cooktime}} mins</span>
+            @switch(recipe.mealType) {
+                @case('breakfast') {
+                    <span class="recipe-card__mealtype">🍳 Breakfast</span>
+                }
+                @case('lunch') {
+                    <span class="recipe-card__mealtype">🥪 Lunch</span>
+                }
+                @case('dinner') {
+                    <span class="recipe-card__mealtype">🍝 Dinner</span>
+                }
+                @case('snack') {
+                    <span class="recipe-card__mealtype">🍿 Snack</span>
+                }
+                @default {
+                    <span class="recipe-card__mealtype">🍽️ Meal</span>
+                }
+            }   
+            <span class="recipe-card__created">📅 {{recipe.created | date:'mediumDate'}}</span>
+            </div>
+        </div>
         <button class="recipe-card__btn" (click)="onViewRecipe()" aria-label="View recipe details">View Details</button>
     </div>
 </article>
+<ng-template #noRecipe>
+    <div class="recipe-card__no-recipe">
+        <p>No recipe data available.</p>
+    </div>
+</ng-template>

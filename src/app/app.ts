@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, computed, signal } from '@angular/core';
 import { RecipeCard } from "./recipe-card/recipe-card";
 import { RecipeService } from '../services/recipes';
 import { Recipe } from '../interfaces';
-import { on } from 'events';
 import { CommonModule } from '@angular/common';
 import { Utils } from '../services/utils';
 
