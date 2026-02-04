@@ -1,4 +1,5 @@
 <main class="app-container">
+  <span>liked {{likedRecipes().size}}</span>
   <section class="search-section">
     <input
       #searchInput
@@ -20,6 +21,8 @@
     <app-recipe-card
      [index]="index+1"
      (recipeSelected)="onRecipeSelected($event)"
+     [liked]="likedRecipes().has(recipe.id)"
+     (likedChange)="onRecipeLiked($event)"
      [recipe]="recipe"/>
     }
     @empty {

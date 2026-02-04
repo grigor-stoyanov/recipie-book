@@ -14,6 +14,17 @@
     position: relative
 }
 
+.recipe-card.pulse {
+animation: pulseAnim 0.6s ease-out;
+}
+
+@keyframes pulseAnim {
+0% { transform: scale(1); }
+30% { transform: scale(1.05); }
+60% { transform: scale(0.97); }
+100% { transform: scale(1); }
+}
+
 .recipe-card:focus,
 .recipe-card:hover {
     transform: translateY(-8px);
@@ -60,14 +71,18 @@
 }
 
 .recipe-card__fav {
+   
     pointer-events: auto;
     border: 0;
     background: rgba(255, 255, 255, 0.9);
     padding: 6px 10px;
     border-radius: 8px;
     font-weight: 600;
-    color: var(--color-accent);
+    color: var(--color-muted);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.recipe-card__fav.liked {
+    color: var(--color-accent);
 }
 
 .recipe-card__body {
@@ -163,4 +178,3 @@
   display: flex;
   flex-direction: column;
 }
-  

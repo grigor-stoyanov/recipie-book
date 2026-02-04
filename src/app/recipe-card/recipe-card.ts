@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, ElementRef } from '@angular/core';
 import { Recipe } from '../../interfaces';
 import { CommonModule } from '@angular/common';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
@@ -14,8 +14,15 @@ export class RecipeCard {
   @Input() index?:number;
   @Output()
   recipeSelected = new EventEmitter<Recipe>();
+  @Input()
+  liked = false;
+  pulsing = false;
 
-  constructor() {}
+  @Output() likedChange = new EventEmitter<{liked: boolean, id: number}>();
+
+  constructor(
+    public host: ElementRef<HTMLElement>
+  ) {}
 
   onViewRecipe() {
     this.recipeSelected.emit(this.recipe);
@@ -43,6 +50,19 @@ export class RecipeCard {
       fontSize: `${Math.max(font, minFont)}rem`,
       lineHeight: font < 0.9 ? '1.15' : '1.25'
     };
+    
+  }
+   toggleLike() {
+    this.likedChange.emit(
+      { liked: !this.liked, id: this.recipe.id }
+    );
+  }
+  
+  pulse() {
+    this.pulsing = true;
 
+    setTimeout(() => {
+      this.pulsing = false;
+    }, 600);
   }
 }

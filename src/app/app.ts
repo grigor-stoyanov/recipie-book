@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, computed, ElementRef, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, ElementRef, signal, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { RecipeCard } from "./recipe-card/recipe-card";
 import { RecipeService } from '../services/recipes';
 import { Recipe } from '../interfaces';
 import { CommonModule } from '@angular/common';
 import { Utils } from '../services/utils';
-import { debounceTime, distinctUntilChanged, Subject,switchMap, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, switchMap, of } from 'rxjs';
 
 
 // Standalone component default by Angular CLI
@@ -16,24 +16,34 @@ import { debounceTime, distinctUntilChanged, Subject,switchMap, of } from 'rxjs'
   styleUrl: './app.scss'
 })
 export class App {
+  currentPage = 0;
   recipes = signal<Recipe[]>([]);
   totalPages = signal(0);
-  currentPage = 0;
   pages = computed(() => {
-   return Array.from(this.utils.range(this.totalPages(),1));
+    return Array.from(this.utils.range(this.totalPages(), 1));
   });
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+
+  // viewchild can reference html element or component instance from current template
+  @ViewChild('searchInput', { read: ElementRef }) searchInput!: ElementRef<HTMLInputElement>;
+
+  @ViewChildren(RecipeCard)
+  cards!: QueryList<RecipeCard>;
+
+  likedRecipes = signal<Set<number>>(new Set<number>());
+
   private searchSubject = new Subject<string>();
+  private cardPositions = new Map<number, DOMRect>();
+
 
   constructor(private recipeService: RecipeService,
-    private utils: Utils
-  ) { 
+    private utils: Utils,
+  ) {
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(query => query
-         ? this.recipeService.getRecipes(0, query)
-         : of({ recipes: { data: [], totalPages: 0 } }))
+        ? this.recipeService.getRecipes(0, query)
+        : of({ recipes: { data: [], totalPages: 0 } }))
     ).subscribe(data => {
       this.recipes.set(data.recipes.data);
       this.totalPages.set(data.recipes.totalPages);
@@ -41,17 +51,46 @@ export class App {
     });
   }
 
+  // lifecycle hook runs after component is created
   ngOnInit() {
+    console.log('App component initialized.');
     this.recipeService.getRecipes().subscribe(data => {
       this.recipes.set(data.recipes.data);
       this.totalPages.set(data.recipes.totalPages);
     });
   }
 
+  ngAfterViewInit() {
+    // After template is initialized
+    this.cards.changes.subscribe(() => {
+      // Updated on structural changes (like *ngFor)
+      this.animateReorder();
+      console.log('Recipe cards updated. Total cards:', this.cards.length);
+    });
+  }
+  onRecipeLiked(liked: { id: number, liked: boolean }) {
+    this.capturePositions();
+    const likedSet = new Set(this.likedRecipes());
+    if (liked.liked) {
+      likedSet.add(liked.id);
+    } else {
+      likedSet.delete(liked.id);
+    }
+    this.likedRecipes.set(likedSet);
+    this.recipes.set(this.recipes()
+      .sort((a, b) => {
+        const aLiked = likedSet.has(a.id);
+        const bLiked = likedSet.has(b.id);
+        if (aLiked && !bLiked) return -1;
+        if (!aLiked && bLiked) return 1;
+        return 0;
+      }));
+  }
+
   loadRecipes(pageNo: number) {
     this.currentPage = pageNo;
     let query;
-    if(this.searchInput.nativeElement.value) {
+    if (this.searchInput.nativeElement.value) {
       query = this.searchInput.nativeElement.value;
     }
     this.recipeService.getRecipes(pageNo, query)
@@ -61,7 +100,6 @@ export class App {
       })
   };
 
-  
   onRecipeSelected(recipe: Recipe) {
     console.log('Selected recipe:', recipe);
   }
@@ -76,5 +114,35 @@ export class App {
   clearSearch() {
     this.searchInput.nativeElement.value = '';
     this.loadRecipes(0);
+  }
+
+  animateReorder() {
+    this.cards.forEach(card => {
+      const el = card.host.nativeElement;
+      const id = card.recipe.id;
+      // get old position
+      const oldPos = this.cardPositions.get(id);
+      if (!oldPos) return;
+      // get new positiona after DOM update
+      const newPos = el.getBoundingClientRect();
+      // Calculate the delta make items appear they still in old position
+      const dx = oldPos.left - newPos.left;
+      const dy = oldPos.top - newPos.top;
+
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      el.style.transition = 'transform 0s';
+      // restore to new position with animation
+      requestAnimationFrame(() => {
+        el.style.transform = '';
+        el.style.transition = 'transform 300ms ease';
+      });
+    });
+
+    this.cardPositions.clear();
+  }
+  capturePositions() {
+    this.cards.forEach(card => {
+      this.cardPositions.set(card.recipe.id, card.host.nativeElement.getBoundingClientRect());
+    });
   }
 }

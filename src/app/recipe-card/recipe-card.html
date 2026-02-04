@@ -1,5 +1,6 @@
 
-<article *ngIf="recipe;else noRecipe" class="recipe-card"
+<article *ngIf="recipe;else noRecipe" class="recipe-card" 
+    [class.pulse]="pulsing"
 [ngClass]="recipeComplexity()"
 tabindex="0" aria-label="Recipe card for {{recipe.title}}">
     <div class="recipe-card__media">
@@ -12,7 +13,7 @@ tabindex="0" aria-label="Recipe card for {{recipe.title}}">
         </div>
         }
         <div class="recipe-card__overlay">
-            <button class="recipe-card__fav" aria-label="Favorite">❤</button>
+            <button (click)="toggleLike()" class="recipe-card__fav" [class.liked]="liked" aria-label="Favorite">❤</button>
         </div>
     </div>
     <div class="recipe-card__body">
@@ -55,6 +56,6 @@ tabindex="0" aria-label="Recipe card for {{recipe.title}}">
 </article>
 <ng-template #noRecipe>
     <div class="recipe-card__no-recipe">
-        <p>No recipe data available.</p>
+        <p>No recipe data available for this recipe.</p>
     </div>
 </ng-template>
