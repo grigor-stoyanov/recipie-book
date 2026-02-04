@@ -12,7 +12,11 @@ export class RecipeService {
   private apiUrl = 'http://localhost:9000/api/recipes';
   constructor(private http: HttpClient) {}
 
-  getRecipes(pageNo=0): Observable<RecipesResponse> {
-    return this.http.get<RecipesResponse>(`${this.apiUrl}?pageNo=${pageNo}`);
+  getRecipes(pageNo=0,searchQuery?:string): Observable<RecipesResponse> {
+    let url = `${this.apiUrl}?pageNo=${pageNo}`;
+    if(searchQuery) {
+      url += `&keyword=${encodeURIComponent(searchQuery)}`;
+    }
+    return this.http.get<RecipesResponse>(url);
   }
 }

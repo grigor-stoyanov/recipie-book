@@ -1,4 +1,19 @@
 <main class="app-container">
+  <section class="search-section">
+    <input
+      #searchInput
+      id="search-query"
+      class="search-input"
+      type="text"
+      placeholder="Search recipes..."
+      (input)="onSearch($event)"
+      aria-label="Search recipes"
+      (keyup.escape)="clearSearch()"
+    />
+    <button
+    *ngIf="searchInput.value.length > 0" 
+    class="clear-button" (click)="clearSearch()" aria-label="Clear search">✖</button>
+  </section>
   <section class="card-wrapper">
     <!-- Control flow syntax. Tracking by recipe.id for better performance. -->
     @for (recipe of recipes(); track trackRecipe(index, recipe); let index = $index) {
