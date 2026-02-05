@@ -17,6 +17,6 @@ export class RecipeService {
     if(searchQuery) {
       url += `&keyword=${encodeURIComponent(searchQuery)}`;
     }
-    return this.http.get<RecipesResponse>(url).pipe(delay(3000)); // Simulate network delay
+    return this.http.get<RecipesResponse>(url).pipe(delay(300)); // Simulate network delay
   }
 }

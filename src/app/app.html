@@ -1,21 +1,36 @@
 <main class="app-container">
+  <app-recipe-detail [recipe]="selectedRecipe()" [ingredientItems]="ingredientItem" />
   <span>liked {{likedRecipes().size}}</span>
+  <section class="search-wrapper">
   <section class="search-section">
     <input #searchInput id="search-query" class="search-input" type="text" placeholder="Search recipes..."
       (input)="onSearch($event)" aria-label="Search recipes" (keyup.escape)="clearSearch()" />
     <button *ngIf="searchInput.value.length > 0" class="clear-button" (click)="clearSearch()"
       aria-label="Clear search">✖</button>
   </section>
+
+  <div class="pagination">
+    <!-- oldsyntax uses *ngFor directive from CommonModule -->
+     @if(this.currentPage > 1) {
+    <button (click)="loadRecipes(currentPage - 1)">&lt;</button>
+     }
+    <button *ngFor="let i of pages()" [class.active]="currentPage === i" (click)="loadRecipes(i)">
+      {{ i }}
+    </button>
+    @if(this.currentPage < this.totalPages()) {
+    <button (click)="loadRecipes(currentPage + 1)">&gt;</button>
+    }
+  </div>
+  </section>
   <section class="card-wrapper">
     <!-- Control flow syntax. Tracking by recipe.id for better performance. -->
     @for (recipe of recipes(); track trackRecipe(index, recipe); let index = $index) {
     <app-recipe-card [isLoading]="isLoading()" [recipe]="recipe" [index]="index + 1"
-      [liked]="likedRecipes().has(recipe.id)" (likedChange)="onRecipeLiked($event)"
+      [liked]="likedRecipes().has(recipe.id)" (likedChange)="onRecipeLiked($event)" [ingredientItem]="ingredientItem"
       (recipeSelected)="onRecipeSelected($event)">
       <div class="recipe-card-placeholder" #cardLoader cardLoader>
         <div class="recipe-card-skeleton">
           <div class="skeleton-image"></div>
-
           <div class="skeleton-content">
             <div class="skeleton-title"></div>
             <div class="skeleton-line"></div>
@@ -23,7 +38,7 @@
           </div>
         </div>
       </div>
-      <img class="recipe-card__img" src="no-image.jpg" />
+      <img class="recipe-card-empty-image" src="no-image.jpg" />
     </app-recipe-card>
     }
 
@@ -31,10 +46,13 @@
     <h1>No recipes available</h1>
     }
   </section>
-  <div class="pagination">
-    <!-- oldsyntax uses *ngFor directive from CommonModule -->
-    <button *ngFor="let i of pages()" [class.active]="currentPage === i" (click)="loadRecipes(i)">
-      {{ i }}
-    </button>
-  </div>
 </main>
+<ng-template #ingredientItem let-item let-showDetails="showDetails">
+  <li class="recipe-card__ingredient-{{item.ingredient.id}}">
+    @if(showDetails) {
+      <span class="ingredient-name">{{ item.ingredient.name }} {{ item.amount }} {{ item.unit }}</span>
+    } @else {
+    {{ item.ingredient.name }}
+    }
+  </li>
+</ng-template>

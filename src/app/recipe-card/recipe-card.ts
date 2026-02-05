@@ -1,5 +1,5 @@
-import { Component, Input, EventEmitter, Output, ElementRef, ContentChild } from '@angular/core';
-import { Recipe } from '../../interfaces';
+import { Component, Input, EventEmitter, Output, ElementRef, ContentChild, TemplateRef } from '@angular/core';
+import { Ingredient, Recipe } from '../../interfaces';
 import { CommonModule } from '@angular/common';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
 
@@ -18,6 +18,7 @@ export class RecipeCard {
   liked = false;
   @Input()
   isLoading!: boolean;
+  @Input() ingredientItem!: TemplateRef<{$implicit: Ingredient, showDetails?: boolean}>;
 
   @Output() likedChange = new EventEmitter<{ liked: boolean, id: number }>();
   @ContentChild('cardLoader') loadingPlaceholder!: ElementRef<HTMLElement>;

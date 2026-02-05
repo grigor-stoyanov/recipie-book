@@ -1,0 +1,58 @@
+.recipe-detail {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.recipe-header {
+  margin-bottom: 1rem;
+}
+
+.recipe-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.recipe-description {
+  margin: 0.5rem 0 0;
+  color: #666;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.ingredients ul,
+.instructions ol {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.ingredients li,
+.instructions li {
+  margin-bottom: 0.4rem;
+}
+
+.ingredient-name {
+  font-weight: 500;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #777;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

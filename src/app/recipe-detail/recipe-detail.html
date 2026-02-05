@@ -1,0 +1,26 @@
+    @if(recipe) {
+        <section class="recipe-detail">
+        <header class="recipe-header">
+            <h2 class="recipe-title">{{ recipe.title }}</h2>
+            <p class="recipe-description">{{ recipe.instructions }}</p>
+        </header>
+
+        <div class="recipe-meta">
+            <span><strong>Cook Time:</strong> {{ recipe.cooktime }} min</span>
+            <span><strong>Meal type:</strong> {{ recipe.mealType }}</span>
+        </div>
+        @for(ingredient of recipe.ingredients;track $index){
+        <ng-container *ngTemplateOutlet="ingredientItems; context: { $implicit: ingredient, showDetails:true }"></ng-container>
+        }
+
+        <!-- <section class="instructions"> 
+            <h3>Instructions</h3>
+            <ol>
+            <li *ngFor="let step of recipe.instructions">
+                {{ step }}
+            </li>
+            </ol>
+        </section> -->
+        </section>
+
+    }

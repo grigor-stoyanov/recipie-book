@@ -5,24 +5,26 @@ import { Recipe } from '../interfaces';
 import { CommonModule } from '@angular/common';
 import { Utils } from '../services/utils';
 import { debounceTime, distinctUntilChanged, Subject, switchMap, of } from 'rxjs';
+import { RecipeDetail } from "./recipe-detail/recipe-detail";
 
 
 // Standalone component default by Angular CLI
 @Component({
   selector: 'app-root',
   // each import is local and scoped to this component
-  imports: [RecipeCard, CommonModule],
+  imports: [RecipeCard, CommonModule, RecipeDetail],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  currentPage = 0;
+  currentPage = 1;
   recipes = signal<Recipe[]>([]);
   totalPages = signal(0);
   pages = computed(() => {
     return Array.from(this.utils.range(this.totalPages(), 1));
   });
   isLoading = signal(true);
+  selectedRecipe = signal<Recipe | null>(null);
 
   // viewchild can reference html element or component instance from current template
   @ViewChild('searchInput', { read: ElementRef }) searchInput!: ElementRef<HTMLInputElement>;
@@ -92,6 +94,8 @@ export class App {
   loadRecipes(pageNo: number) {
     this.currentPage = pageNo;
     let query;
+    this.isLoading.set(true);
+    this.recipes.set(Array.from({ length: 6 }, (_, i) => this.utils.createEmptyRecipe(i)) as Recipe[]);
     if (this.searchInput.nativeElement.value) {
       query = this.searchInput.nativeElement.value;
     }
@@ -99,11 +103,13 @@ export class App {
       .subscribe(data => {
         this.recipes.set(data.recipes.data);
         this.totalPages.set(data.recipes.totalPages);
+        this.isLoading.set(false);
       })
   };
 
   onRecipeSelected(recipe: Recipe) {
-    console.log('Selected recipe:', recipe);
+    this.selectedRecipe.set(recipe);
+    console.log('Recipe selected:', recipe);
   }
   // custom tracking function to identify unique items
   trackRecipe(index: number, recipe: Recipe) {
