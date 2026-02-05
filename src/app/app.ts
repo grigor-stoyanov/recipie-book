@@ -22,6 +22,7 @@ export class App {
   pages = computed(() => {
     return Array.from(this.utils.range(this.totalPages(), 1));
   });
+  isLoading = signal(true);
 
   // viewchild can reference html element or component instance from current template
   @ViewChild('searchInput', { read: ElementRef }) searchInput!: ElementRef<HTMLInputElement>;
@@ -54,9 +55,11 @@ export class App {
   // lifecycle hook runs after component is created
   ngOnInit() {
     console.log('App component initialized.');
+    this.recipes.set(Array.from({ length: 6 }, (_, i) => this.utils.createEmptyRecipe(i)) as Recipe[]);
     this.recipeService.getRecipes().subscribe(data => {
       this.recipes.set(data.recipes.data);
       this.totalPages.set(data.recipes.totalPages);
+      this.isLoading.set(false);
     });
   }
 
@@ -65,7 +68,6 @@ export class App {
     this.cards.changes.subscribe(() => {
       // Updated on structural changes (like *ngFor)
       this.animateReorder();
-      console.log('Recipe cards updated. Total cards:', this.cards.length);
     });
   }
   onRecipeLiked(liked: { id: number, liked: boolean }) {

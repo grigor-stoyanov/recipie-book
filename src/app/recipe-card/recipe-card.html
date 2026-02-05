@@ -1,6 +1,5 @@
 
-<article *ngIf="recipe;else noRecipe" class="recipe-card" 
-    [class.pulse]="pulsing"
+<article *ngIf="!isLoading;else recipePlaceHolder" class="recipe-card"
 [ngClass]="recipeComplexity()"
 tabindex="0" aria-label="Recipe card for {{recipe.title}}">
     <div class="recipe-card__media">
@@ -9,7 +8,8 @@ tabindex="0" aria-label="Recipe card for {{recipe.title}}">
         }
         @else {
         <div class="recipe-card__placeholder" aria-label="No image available">
-            <span class="recipe-card__placeholder-text">No Image available</span>
+            <!-- project content from parent -->
+            <ng-content [select]="img"></ng-content>
         </div>
         }
         <div class="recipe-card__overlay">
@@ -54,8 +54,6 @@ tabindex="0" aria-label="Recipe card for {{recipe.title}}">
         <button class="recipe-card__btn" (click)="onViewRecipe()" aria-label="View recipe details">View Details</button>
     </div>
 </article>
-<ng-template #noRecipe>
-    <div class="recipe-card__no-recipe">
-        <p>No recipe data available for this recipe.</p>
-    </div>
+<ng-template #recipePlaceHolder>
+   <ng-content select="[cardLoader]"></ng-content>
 </ng-template>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { delay, Observable } from 'rxjs';
 import { Recipe } from '../interfaces';
 interface RecipesResponse {
   recipes: {data: Recipe[], total: number, page: number, limit: number,totalPages:number};
@@ -17,6 +17,6 @@ export class RecipeService {
     if(searchQuery) {
       url += `&keyword=${encodeURIComponent(searchQuery)}`;
     }
-    return this.http.get<RecipesResponse>(url);
+    return this.http.get<RecipesResponse>(url).pipe(delay(3000)); // Simulate network delay
   }
 }
