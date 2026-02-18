@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, ElementRef, signal, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, ElementRef, signal, ViewChild, ViewChildren, QueryList, Host } from '@angular/core';
 import { RecipeCard } from "./recipe-card/recipe-card";
 import { RecipeService } from '../services/recipes';
 import { Recipe } from '../interfaces';
@@ -6,13 +6,14 @@ import { CommonModule } from '@angular/common';
 import { Utils } from '../services/utils';
 import { debounceTime, distinctUntilChanged, Subject, switchMap, of } from 'rxjs';
 import { RecipeDetail } from "./recipe-detail/recipe-detail";
+import { Draggable } from "../directives/draggable";
 
 
 // Standalone component default by Angular CLI
 @Component({
   selector: 'app-root',
   // each import is local and scoped to this component
-  imports: [RecipeCard, CommonModule, RecipeDetail],
+  imports: [RecipeCard, CommonModule, RecipeDetail, Draggable],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -28,10 +29,11 @@ export class App {
 
   // viewchild can reference html element or component instance from current template
   @ViewChild('searchInput', { read: ElementRef }) searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('likedArea', { static: true }) likedArea!: ElementRef;
+  @ViewChildren(Draggable) draggables!: QueryList<Draggable>;
 
   @ViewChildren(RecipeCard)
   cards!: QueryList<RecipeCard>;
-
   likedRecipes = signal<Set<number>>(new Set<number>());
 
   private searchSubject = new Subject<string>();
@@ -71,6 +73,9 @@ export class App {
       // Updated on structural changes (like *ngFor)
       this.animateReorder();
     });
+    this.draggables.changes.subscribe((data) => {
+      console.log(data);
+    })
   }
   onRecipeLiked(liked: { id: number, liked: boolean }) {
     this.capturePositions();
@@ -153,4 +158,32 @@ export class App {
       this.cardPositions.set(card.recipe.id, card.host.nativeElement.getBoundingClientRect());
     });
   }
+
+  onDrop({ dragged, target }: { dragged: RecipeCard; target: HTMLElement | null; }) {
+    if (!target) return;
+    console.log({ dragged, target });
+    if (this.likedArea.nativeElement === target) {
+      dragged.toggleLike();
+    }
+    // TODO: finish drag and drop reorder logic.
+    const targetCardIndex = this.draggables.filter((e)=>e.host.id!=dragged.host.nativeElement.id)
+      .find((e) => e.host.contains(target))?.recipeCard.index;
+    if (!targetCardIndex) return;
+    const list = [...this.recipes()];
+
+    const from = list.indexOf(dragged.recipe);
+    const to = targetCardIndex;
+
+    if (from === -1 || to === -1 || from === to) return;
+
+    // swap positions by moving the dragged item
+    const [item] = list.splice(from, 1);
+    list.splice(to, 0, item);
+
+    this.recipes.set(list);
+
+
+  }
+
+
 }

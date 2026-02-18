@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { delay, Observable } from 'rxjs';
+import { delay, Observable, catchError, of } from 'rxjs';
 import { Recipe } from '../interfaces';
 interface RecipesResponse {
-  recipes: {data: Recipe[], total: number, page: number, limit: number,totalPages:number};
+  recipes: {data: Recipe[] | [], total?: number, page?: number, limit?: number,totalPages:number};
 }
 @Injectable({
   providedIn: 'root',
@@ -17,6 +17,18 @@ export class RecipeService {
     if(searchQuery) {
       url += `&keyword=${encodeURIComponent(searchQuery)}`;
     }
-    return this.http.get<RecipesResponse>(url).pipe(delay(300)); // Simulate network delay
+    return this.http.get<RecipesResponse>(url)
+      .pipe(delay(300),  // Simulate network delay
+         catchError(err => {
+            console.error('API error:', err);
+            const emptyResponse: RecipesResponse = {
+              recipes: {
+                data: [],
+                totalPages: 0
+              }
+            };
+            return of(emptyResponse);
+          })
+        );
   }
 }

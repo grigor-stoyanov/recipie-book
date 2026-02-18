@@ -1,7 +1,8 @@
-import { Component, Input, EventEmitter, Output, ElementRef, ContentChild, TemplateRef } from '@angular/core';
+import { Component, Input, EventEmitter, Output, ElementRef, ContentChild, TemplateRef, ViewChild } from '@angular/core';
 import { Ingredient, Recipe } from '../../interfaces';
 import { CommonModule } from '@angular/common';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
+import { Draggable } from '../../directives/draggable';
 
 @Component({
   selector: 'app-recipe-card',
@@ -19,9 +20,11 @@ export class RecipeCard {
   @Input()
   isLoading!: boolean;
   @Input() ingredientItem!: TemplateRef<{$implicit: Ingredient, showDetails?: boolean}>;
+  @Input() drag!: Draggable;
 
   @Output() likedChange = new EventEmitter<{ liked: boolean, id: number }>();
   @ContentChild('cardLoader') loadingPlaceholder!: ElementRef<HTMLElement>;
+
   
   private shimmerInterval!: ReturnType<typeof setInterval>;
 
@@ -79,4 +82,5 @@ export class RecipeCard {
       { liked: !this.liked, id: this.recipe.id }
     );
   }
+
 }
