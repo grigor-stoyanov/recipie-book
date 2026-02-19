@@ -9,3 +9,7 @@ export interface Recipe {
   mealType?: string;
   ingredients: Ingredient[];
 }
+
+export interface RecipesResponse {
+  recipes: {data: Recipe[] | [], total?: number, page?: number, limit?: number,totalPages:number};
+}

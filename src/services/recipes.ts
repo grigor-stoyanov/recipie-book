@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay, Observable, catchError, of } from 'rxjs';
-import { Recipe } from '../interfaces';
-interface RecipesResponse {
-  recipes: {data: Recipe[] | [], total?: number, page?: number, limit?: number,totalPages:number};
-}
-@Injectable({
-  providedIn: 'root',
-})
+import { RecipesResponse } from '../interfaces';
+
+// Single instance provided in the root available for injection in constructor
+// @Injectable({
+//   // provides a factory for service
+//   providedIn: 'root',
+// })
 export class RecipeService {
   private apiUrl = 'http://localhost:9000/api/recipes';
   private apiUrl2 = 'http://172.21.227.48:9000/api/recipes';
@@ -32,4 +32,8 @@ export class RecipeService {
           })
         );
   }
+
+  // TODO: add recipe edit/add
+
+  // TODO: demonstrate async pipe
 }

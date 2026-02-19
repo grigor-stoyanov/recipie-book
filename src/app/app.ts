@@ -8,15 +8,24 @@ import {
   ViewChildren,
   QueryList,
   Host,
+  InjectionToken,
+  Inject,
 } from '@angular/core';
-import { RecipeCard } from './recipe-card/recipe-card';
+import { RecipeCard } from '../components/recipe-card/recipe-card';
 import { RecipeService } from '../services/recipes';
 import { Recipe } from '../interfaces';
 import { CommonModule } from '@angular/common';
 import { Utils } from '../services/utils';
 import { debounceTime, distinctUntilChanged, Subject, switchMap, of } from 'rxjs';
-import { RecipeDetail } from './recipe-detail/recipe-detail';
+import { RecipeDetail } from '../components/recipe-detail/recipe-detail';
 import { Draggable } from '../directives/draggable';
+import { HttpClient } from '@angular/common/http';
+
+function recipeServiceProvider(http:HttpClient): RecipeService{
+  return new RecipeService(http);
+}
+// unique identifier for dependency
+const RECIPE_SERVICE = new InjectionToken<RecipeService>('RECIPE_SERVICE');
 
 // Standalone component default by Angular CLI
 @Component({
@@ -24,6 +33,9 @@ import { Draggable } from '../directives/draggable';
   // each import is local and scoped to this component
   imports: [RecipeCard, CommonModule, RecipeDetail, Draggable],
   templateUrl: './app.html',
+  providers:[
+    {provide: RECIPE_SERVICE, useFactory: recipeServiceProvider,deps:[HttpClient]}
+  ],
   styleUrl: './app.scss',
 })
 export class App {
@@ -49,7 +61,7 @@ export class App {
   private cardPositions = new Map<number, DOMRect>();
 
   constructor(
-    private recipeService: RecipeService,
+    @Inject(RECIPE_SERVICE) private recipeService: RecipeService,
     private utils: Utils,
   ) {
     this.searchSubject

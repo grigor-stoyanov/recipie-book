@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener, Renderer2, Output, EventEmitter, HostBinding, Host, Optional } from '@angular/core';
-import { RecipeCard } from '../app/recipe-card/recipe-card';
+import { RecipeCard } from '../components/recipe-card/recipe-card';
 
 @Directive({
   selector: '[appDraggable]',
