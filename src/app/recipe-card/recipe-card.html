@@ -4,7 +4,8 @@
 tabindex="0" aria-label="Recipe card for {{recipe.title}}">
     <div class="recipe-card__media">
         @if(recipe.iconUrl) {
-        <img draggable=false class="recipe-card__img" [src]="recipe.iconUrl" [alt]="recipe.title" />
+            <img draggable=false *ngxUnless="!imgFailed" (error)="onImgError()"  class="recipe-card__img" [src]="recipe.iconUrl" [alt]="recipe.title" />
+            <img draggable=false *ngxUnless="imgFailed" class="recipe-card-empty-image" src="no-image.jpg" alt="Loading failed"/>
         }
         @else {
             <!-- project content from parent -->

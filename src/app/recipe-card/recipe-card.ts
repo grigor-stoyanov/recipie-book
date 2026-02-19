@@ -3,10 +3,11 @@ import { Ingredient, Recipe } from '../../interfaces';
 import { CommonModule } from '@angular/common';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
 import { Draggable } from '../../directives/draggable';
+import { NgxUnless } from '../../directives/ngx-unless';
 
 @Component({
   selector: 'app-recipe-card',
-  imports: [CommonModule, TruncatePipe],
+  imports: [CommonModule, TruncatePipe, NgxUnless],
   templateUrl: './recipe-card.html',
   styleUrl: './recipe-card.scss'
 })
@@ -21,10 +22,11 @@ export class RecipeCard {
   isLoading!: boolean;
   @Input() ingredientItem!: TemplateRef<{$implicit: Ingredient, showDetails?: boolean}>;
   @Input() drag!: Draggable;
-
+  
   @Output() likedChange = new EventEmitter<{ liked: boolean, id: number }>();
   @ContentChild('cardLoader') loadingPlaceholder!: ElementRef<HTMLElement>;
-
+  
+  imgFailed = false;
   
   private shimmerInterval!: ReturnType<typeof setInterval>;
 
@@ -81,6 +83,12 @@ export class RecipeCard {
     this.likedChange.emit(
       { liked: !this.liked, id: this.recipe.id }
     );
+  }
+
+
+  onImgError() {
+    this.imgFailed = true;
+    console.log('error', this.imgFailed)
   }
 
 }
