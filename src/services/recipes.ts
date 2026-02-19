@@ -10,10 +10,11 @@ interface RecipesResponse {
 })
 export class RecipeService {
   private apiUrl = 'http://localhost:9000/api/recipes';
+  private apiUrl2 = 'http://172.21.227.48:9000/api/recipes';
   constructor(private http: HttpClient) {}
 
   getRecipes(pageNo=0,searchQuery?:string): Observable<RecipesResponse> {
-    let url = `${this.apiUrl}?pageNo=${pageNo}`;
+    let url = `${this.apiUrl2}?pageNo=${pageNo}`;
     if(searchQuery) {
       url += `&keyword=${encodeURIComponent(searchQuery)}`;
     }
