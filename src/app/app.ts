@@ -10,6 +10,8 @@ import {
   Host,
   InjectionToken,
   Inject,
+  Optional,
+  Self,
 } from '@angular/core';
 import { RecipeCard } from '../components/recipe-card/recipe-card';
 import { RecipeService } from '../services/recipes';
@@ -20,9 +22,10 @@ import { debounceTime, distinctUntilChanged, Subject, switchMap, of } from 'rxjs
 import { RecipeDetail } from '../components/recipe-detail/recipe-detail';
 import { Draggable } from '../directives/draggable';
 import { HttpClient } from '@angular/common/http';
+import { ApiConfig, CONFIG_TOKEN } from '../config';
 
-function recipeServiceProvider(http:HttpClient): RecipeService{
-  return new RecipeService(http);
+function recipeServiceProvider(http:HttpClient,config: ApiConfig): RecipeService{
+  return new RecipeService(http,config) ;
 }
 // unique identifier for dependency
 const RECIPE_SERVICE = new InjectionToken<RecipeService>('RECIPE_SERVICE');
@@ -34,8 +37,9 @@ const RECIPE_SERVICE = new InjectionToken<RecipeService>('RECIPE_SERVICE');
   imports: [RecipeCard, CommonModule, RecipeDetail, Draggable],
   templateUrl: './app.html',
   providers:[
-    {provide: RECIPE_SERVICE, useFactory: recipeServiceProvider,deps:[HttpClient]}
-  ],
+    // provider will inject config despite root not requiring it
+    {provide: RECIPE_SERVICE, useFactory: recipeServiceProvider,deps:[HttpClient,CONFIG_TOKEN]},
+  ],  
   styleUrl: './app.scss',
 })
 export class App {
@@ -61,7 +65,8 @@ export class App {
   private cardPositions = new Map<number, DOMRect>();
 
   constructor(
-    @Inject(RECIPE_SERVICE) private recipeService: RecipeService,
+    // Give me the instance of service associated with this component (not from root)
+    @Self() @Inject(RECIPE_SERVICE) private recipeService: RecipeService,
     private utils: Utils,
   ) {
     this.searchSubject

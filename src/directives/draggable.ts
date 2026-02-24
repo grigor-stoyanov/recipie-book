@@ -33,6 +33,7 @@ export class Draggable {
   constructor(
     private el: ElementRef,
      private renderer: Renderer2,
+     // binds dependencies of host component to directive
     @Host() @Optional() public recipeCard: RecipeCard) {
   }
 
